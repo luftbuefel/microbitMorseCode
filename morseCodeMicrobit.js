@@ -1,18 +1,52 @@
-let dividingCharacter = ""
-let numWords = 0
-let receivedWords: number[] = []
 let formattedReceivedString = ""
+let receivedMessage = ""
 let letter = ""
+let dividingCharacter = ""
 let finalMessage = ""
 let message = ""
 let receivedString = ""
-function reset() {
+input.onButtonPressed(Button.A, () => {
+    message = "" + message + "*"
+})
+input.onGesture(Gesture.ScreenDown, () => {
+    message = "" + message + dividingCharacter
+})
+input.onButtonPressed(Button.B, () => {
+    message = "" + message + "-"
+})
+function decodeMessage()  {
+    finalMessage = ""
+    for (let index = 0; index <= formattedReceivedString.length; index++) {
+        if (formattedReceivedString.charAt(index) != dividingCharacter) {
+            letter = "" + letter + formattedReceivedString.charAt(index)
+        } else {
+            lookUpLetter()
+        }
+    }
+}
+input.onButtonPressed(Button.AB, () => {
+    if (message != "") {
+        radio.sendString(message)
+        basic.showIcon(IconNames.Diamond)
+        basic.showIcon(IconNames.SmallDiamond)
+        basic.showIcon(IconNames.Diamond)
+        basic.showLeds(`
+            . . . . .
+            . . . . .
+            . . . . .
+            . . . . .
+            . . . . .
+            `)
+        message = ""
+    }
+})
+function reset()  {
     finalMessage = ""
     letter = ""
     receivedString = ""
     formattedReceivedString = ""
 }
-function lookUpLetter() {
+function lookUpLetter()  {
     if (letter == "*-") {
         finalMessage = "" + finalMessage + "a"
     }
@@ -123,60 +157,20 @@ function lookUpLetter() {
     }
     letter = ""
 }
-input.onGesture(Gesture.ScreenDown, () => {
-    message = "" + message + "/"
-})
-input.onButtonPressed(Button.A, () => {
-    message = "" + message + "*"
-})
-input.onButtonPressed(Button.B, () => {
-    message = "" + message + "-"
-})
-radio.onDataPacketReceived(({ receivedString }) => {
+radio.onDataPacketReceived( ({ receivedString }) =>  {
     finalMessage = ""
-    if (receivedString.charAt(receivedString.length) != "/") {
+    if (receivedString.charAt(receivedString.length) != dividingCharacter) {
         formattedReceivedString = "" + receivedString + "/"
     } else {
         formattedReceivedString = receivedString
     }
-    for (let index = 0; index <= formattedReceivedString.length; index++) {
-        if (formattedReceivedString.charAt(index) != "/") {
-            letter = "" + letter + formattedReceivedString.charAt(index)
-        } else {
-            lookUpLetter()
-        }
-    }
+    decodeMessage()
     basic.showString(finalMessage)
     reset()
 })
-input.onButtonPressed(Button.AB, () => {
-    radio.sendString(message)
-    basic.showIcon(IconNames.Diamond)
-    basic.showIcon(IconNames.SmallDiamond)
-    basic.showIcon(IconNames.Diamond)
-    basic.showLeds(`
-        . . . . .
-        . . . . .
-        . . . . .
-        . . . . .
-        . . . . .
-        `)
-    message = ""
-})
-function parseMorseCode() {
-    for (let i = 0; i <= receivedMessage.length; i++) {
-        while (receivedMessage.charAt(i) != "/") {
-            letter = "" + letter + receivedMessage.charAt(i)
-        }
-        lookUpLetter()
-    }
-}
-let receivedMessage = ""
+dividingCharacter = "/"
+receivedMessage = ""
+receivedString = ""
+formattedReceivedString = ""
 radio.setGroup(1)
 radio.setTransmitPower(7)
-message = ""
-receivedMessage = ""
-receivedWords = [0]
-numWords = 0
-dividingCharacter = "/"
-finalMessage = "None"
