@@ -8,8 +8,8 @@ let receivedString = ""
 input.onButtonPressed(Button.A, () => {
     message = "" + message + "*"
 })
-input.onGesture(Gesture.ScreenDown, () => {
-    message = "" + message + dividingCharacter
+input.onGesture(Gesture.LogoUp, () => {
+    message = message + dividingCharacter
 })
 input.onButtonPressed(Button.B, () => {
     message = "" + message + "-"
